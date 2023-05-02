@@ -1,0 +1,149 @@
+<html>
+
+<head>
+    <title>GPA Calculator</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-OERcA2EqjJCMA+/3y+gxIOqMEjwtxJY7qPCqsdltbNJuaOe923+mo//f6V8Qbsw3"
+        crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.5.0.js"></script>
+</head>
+
+<body style="padding-left: 15px; padding-top: 10px;">
+    <h1>GPA Calculator</h1>
+    <table>
+        <tr>
+            <th>Enter 5 grades (as percentages) into the following form <br> </th>
+        </tr>
+        <tr>
+            <td>
+                <br>
+                <form id="myForm">
+                    <!-- Grades Form -->
+                    <div class="mb-3">
+                        <label for="inputGrade1" class="col-form-label">Grade 1</label>
+                        <input type="text" class="form-control" id="inputGrade1" name="inputGrade1">
+                    </div>
+                    <div class="mb-3">
+                        <label for="inputGrade2" class="col-form-label">Grade 2</label>
+                        <input type="text" class="form-control" id="inputGrade2" name="inputGrade2">
+                    </div>
+                    <div class="mb-3">
+                        <label for="inputGrade3" class="col-form-label">Grade 3</label>
+                        <input type="text" class="form-control" id="inputGrade3" name="inputGrade3">
+                    </div>
+                    <div class="mb-3">
+                        <label for="inputGrade4" class="col-form-label">Grade 4</label>
+                        <input type="text" class="form-control" id="inputGrade4" name="inputGrade4">
+                    </div>
+                    <div class="mb-3">
+                        <label for="inputGrade5" class="col-form-label">Grade 5</label>
+                        <input type="text" class="form-control" id="inputGrade5" name="inputGrade5">
+                    </div>
+
+                </form>
+            </td>
+        </tr>
+    </table>
+    <button type="button" onclick="calcAdjGpa()" class="btn btn-warning" data-bs-toggle="modal"
+        data-bs-target="#createModal2">Calculate Adjusted GPA</button>
+    <button type="button" onclick="reset()" class="btn btn-secondary">Reset</button>
+    <button type="button" onclick="calcGpa()" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#createModal"
+        >Calculate GPA</button>
+    <!--GPA Modal-->
+    <div class="modal fade" id="createModal" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modal-title"></h5>
+                </div>
+                <div class="modal-body">
+                    <p id="percent"></p>
+                    <br>
+                    <p id="letter"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--Adjusted GPA Modal-->
+    <div class="modal fade" id="createModal2" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modal-title"></h5>
+                </div>
+                <div class="modal-body">
+                    <p id="percent2"></p>
+                    <br>
+                    <p id="letter2"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+         function getLetterGrade(gpa) {
+            var letterGrade = "";
+            if (gpa >= 80) {
+                letterGrade = "A"
+            } else if (gpa >= 68 && gpa <= 89) {
+                letterGrade = "B"
+            } else if (gpa >= 55 && gpa <= 67) {
+                letterGrade = "C"
+            } else if (gpa >= 50 && gpa <= 54) {
+                letterGrade = "D"
+            } else {
+                letterGrade = "F"
+            }
+            return letterGrade
+        }
+        function calcGpa() {
+            var grades = $("#myForm").serializeArray(); //arr
+            $("#modal-title").text("Your Grade Point Average");
+            var gpa = 0;
+            for (i = 0; i < grades.length; i++) { //add
+                gpa += (grades[i].value * 1);
+            }
+            gpa = gpa / grades.length;
+            var letterGrade = getLetterGrade(gpa);
+            document.getElementById("percent").innerHTML = "Your average grade in percent form is: " + gpa;
+            document.getElementById("letter").innerHTML = "Your average as a letter grade is: " + letterGrade;
+        }
+        function calcAdjGpa() {
+            var grades = $("#myForm").serializeArray();
+            $("#modal-title").text("Your Adjusted Grade Point Average");
+            var min = Number.MAX_VALUE; //base min value
+            var idx = 0;
+            var gpa = 0;
+            for(i = 0; i < grades.length; i++) { //find min value
+                if((grades[i].value * 1) < min) {
+                    min = (grades[i].value * 1) 
+                    idx = i;
+                }
+            }
+            grades.splice(idx,1); //remove lowest value
+
+            for (var i = 0; i < grades.length; i++) { //add
+                gpa += (grades[i].value * 1);
+            }
+            gpa = gpa / grades.length; //final gpa
+            var letterGrade = getLetterGrade(gpa);
+            //for modal
+            document.getElementById("percent2").innerHTML = "Your average grade in percent form is: " + gpa;
+            document.getElementById("letter2").innerHTML = "Your average as a letter grade is: " + letterGrade;
+        }
+        function reset() {
+            //reset form
+            document.getElementById("myForm").reset();
+        }
+    </script>
+</body>
+
+</html>
